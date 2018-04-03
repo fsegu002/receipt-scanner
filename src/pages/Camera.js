@@ -4,7 +4,8 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  StatusBar
 } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 
@@ -12,10 +13,13 @@ export default class CameraPage extends Component {
   static navigationOptions = {
     title: 'Camera'
   }
+  
   render() {
-    const { navigate } = this.props.navigation;
     return (
       <View style={styles.container}>
+        <StatusBar
+          barStyle="light-content"
+        />
         <RNCamera
             ref={ref => {
               this.camera = ref;
@@ -31,7 +35,7 @@ export default class CameraPage extends Component {
             onPress={this.takePicture.bind(this)}
             style = {styles.capture}
         >
-            <Text style={{fontSize: 14}}> SNAP </Text>
+            <Text style={{fontSize: 14, color: 'white'}}> SNAP </Text>
         </TouchableOpacity>
         </View>
       </View>
@@ -65,11 +69,12 @@ const styles = StyleSheet.create({
   },
   capture: {
     flex: 0,
-    backgroundColor: '#fff',
     borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#fff',
     padding: 15,
     paddingHorizontal: 20,
     alignSelf: 'center',
-    margin: 20
+    margin: 40
   }
 });

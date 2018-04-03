@@ -4,13 +4,13 @@ import {
   Text, 
   StyleSheet
 } from 'react-native';
-import { Tabs } from './src/configuration/Navigation';
+import { StackModal } from './src/configuration/Navigation';
 
 export default class App extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Tabs />
+        <StackModal />
       </View>
     );
   }

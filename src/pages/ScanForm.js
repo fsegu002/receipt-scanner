@@ -4,8 +4,11 @@ import {
   View, 
   Text, 
   TextInput,
-  Image
+  Image,
+  TouchableOpacity,
+  StatusBar
  } from 'react-native';
+ import Axios from 'axios'
 
 export default class ScanForm extends Component {
   static navigationOptions = {
@@ -14,35 +17,72 @@ export default class ScanForm extends Component {
   constructor(props){
     super(props)
     this.state = {
-      name: '',
-      url: ''
+      
     }
     this.handleChangeText = this.handleChangeText.bind(this)
+
   }
+  componentDidMount = () => {
+    const { params } = this.props.navigation.state;
+    const imageUri = params ? JSON.stringify(params.imageUri) : ' ';
+    this.setState({url: imageUri.replace(/\"/g, "")})
+  };
+  
   componentDidUpdate() {
     console.log(this.state.name)
+    console.log(this.state.url)
   }
   handleChangeText(val){
     let text = val
     this.setState({name: text})
     
   }
-  render() {
-    const { navigate } = this.props.navigation;
-    const { params } = this.props.navigation.state;
-    const imageUri = params ? JSON.stringify(params.imageUri) : '';
-    
+  sendFormInfo(){
+    // TODO: replace is not the correct function
+    // change navigation to send form state to the parent state
+    Axios.post('http://localhost:1337/scan', {
+      name: this.state.name,
+      imageUrl: this.state.url
+    })
+      .then((response)=>{
+        console.log(response)
+        const { popToTop } = this.props.navigation;
+        if (this.state.name){
+          popToTop()
+        }
+      })
+      .catch((err)=>{
+        console.log(err)
+      })
+
+  }
+  render() {    
     return (
       <View style={styles.container}>
+        <StatusBar
+          barStyle="light-content"
+        />
         <Text 
           style={styles.welcome}
-          value={this.state.name} />
+          value={this.state.name} 
+        />
         <TextInput 
           style={styles.input}
           value={this.state.name}
           onChangeText={this.handleChangeText}
         />
-        { (imageUri != '') ? <Image style={{width: 300, height: 500}} source={{uri: imageUri.replace(/\"/g, "") }} /> : false}
+        <Image 
+          style={{width: 300, height: 500}} 
+          source={{uri: this.state.url}} 
+        />
+        <TouchableOpacity
+            onPress={this.sendFormInfo.bind(this)}
+            style = {styles.button}
+        >
+            <Text 
+              style={styles.button}
+            > SAVE </Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -59,11 +99,21 @@ const styles = StyleSheet.create({
     width: 300,
     height: 40, 
     borderColor: 'gray', 
-    borderWidth: 1
+    borderWidth: 1,
+    marginBottom: 15,
+    padding: 5
   },
   welcome: {
     fontSize: 20,
     textAlign: 'center',
     margin: 10,
   },
+  button: {
+    margin: 15,
+  },
+
+  buttonText: {
+    fontSize: 14,
+    color: 'green'
+  }
 });

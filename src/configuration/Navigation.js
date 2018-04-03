@@ -1,28 +1,40 @@
 import React, { Component } from 'react';
 import {  View, Text, } from 'react-native';
 import { StackNavigator, TabNavigator } from 'react-navigation'
-import HomePage from '../pages/Home'
-import CameraPage from '../pages/Camera'
+import Home from '../pages/Home'
+import Camera from '../pages/Camera'
 import ScanForm from '../pages/ScanForm'
 
-export const Tabs = TabNavigator({
-  Home: { screen: HomePage },
-  Camera: { screen: CameraPage },
-  ScanForm: { screen: ScanForm }
+export const Stack = StackNavigator({
+  Home: { screen: Home },
+  ScanForm: { screen: ScanForm },
 }, {
-  initialRouteName: 'Home'
-    
-})
-
-export const StackNav = StackNavigator({
-  Home: { screen: HomePage },
-  Camera: { screen: CameraPage }
-}, {
+  initialRouteName: 'Home',
   navigationOptions: {
     headerStyle: {
-      backgroundColor: '#ffffff'
-    }
+      backgroundColor: '#6CF0AE'
+    },
+    headerTitleStyle: {color: '#ffffff'}
   }
 })
+export const StackModal = StackNavigator(
+  {
+    Main: { screen: Stack },
+    Camera: { screen: Camera },
+  },
+  {
+    mode: 'modal',
+    headerMode: 'none',
+  }
+)
+// export const Tabs = TabNavigator({
+//   Home: { screen: Home },
+//   Camera: { screen: Stack }
+// }, {
+//   initialRouteName: 'Home'
+    
+// })
+
+
 
 
