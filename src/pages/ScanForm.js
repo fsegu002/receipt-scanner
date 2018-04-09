@@ -2,12 +2,13 @@ import React, { Component } from 'react';
 import {  
   StyleSheet,
   View, 
-  Text, 
-  TextInput,
   Image,
-  TouchableOpacity,
+  Text,
+  TextInput,
   StatusBar
  } from 'react-native';
+ import Icon from 'react-native-vector-icons/FontAwesome';
+ import { Input, Button } from 'react-native-elements';
  import Axios from 'axios'
 
 export default class ScanForm extends Component {
@@ -19,35 +20,45 @@ export default class ScanForm extends Component {
     this.state = {
       
     }
-    this.handleChangeText = this.handleChangeText.bind(this)
+    this._handleChangeName = this._handleChangeName.bind(this)
+    this._handleChangeTotal = this._handleChangeTotal.bind(this)
 
   }
   componentDidMount = () => {
-    const { params } = this.props.navigation.state;
+    const { params } = this.props.navigation.state;    
     const imageUri = params ? JSON.stringify(params.imageUri) : ' ';
-    this.setState({url: imageUri.replace(/\"/g, "")})
-  };
+    this.setState({url: imageUri.replace(/\"/g, "")});
+    const newDate = this._customDate()    
+    this.setState({name: `Scan: ${newDate}`})
+  }
   
   componentDidUpdate() {
-    console.log(this.state.name)
-    console.log(this.state.url)
+    console.log(this.state)
   }
-  handleChangeText(val){
+  _customDate() {
+    let newDate = new Date()
+    let customDate = `${newDate.getFullYear()}-${newDate.getMonth()+1}-${newDate.getDate()} ${newDate.getHours()}:${newDate.getMinutes()}:${newDate.getSeconds()}`
+    return customDate
+  }
+  _handleChangeName(val){
     let text = val
-    this.setState({name: text})
-    
+    this.setState({name: text})    
   }
-  sendFormInfo(){
-    // TODO: replace is not the correct function
-    // change navigation to send form state to the parent state
-    Axios.post('http://localhost:1337/scan', {
+  _handleChangeTotal(val){
+    let text = val
+    this.setState({total: text})    
+  }
+  _sendFormInfo(){
+    let form = {
       name: this.state.name,
+      total: this.state.total,
       imageUrl: this.state.url
-    })
+    }
+    Axios.post('https://receipt-scanner-api.herokuapp.com/scan', form)
       .then((response)=>{
         console.log(response)
         const { popToTop } = this.props.navigation;
-        if (this.state.name){
+        if (this.state.name && this.state.total){
           popToTop()
         }
       })
@@ -56,33 +67,36 @@ export default class ScanForm extends Component {
       })
 
   }
-  render() {    
+  render() {
     return (
       <View style={styles.container}>
         <StatusBar
           barStyle="light-content"
         />
-        <Text 
-          style={styles.welcome}
-          value={this.state.name} 
-        />
         <TextInput 
           style={styles.input}
           value={this.state.name}
-          onChangeText={this.handleChangeText}
+          onChangeText={this._handleChangeName}
+          placeholder='Name'
+        />
+        <TextInput 
+          style={styles.input}
+          value={this.state.total}
+          onChangeText={this._handleChangeTotal}
+          placeholder='Total'
+          keyboardType='numeric'
         />
         <Image 
-          style={{width: 300, height: 500}} 
+          style={{width: 300, height: 300}} 
           source={{uri: this.state.url}} 
         />
-        <TouchableOpacity
-            onPress={this.sendFormInfo.bind(this)}
-            style = {styles.button}
-        >
-            <Text 
-              style={styles.button}
-            > SAVE </Text>
-        </TouchableOpacity>
+        <Button
+          style={styles.button}
+          onPress={this._sendFormInfo.bind(this)}
+          title='Save'   
+          color= '#6CF0AE'
+          buttonStyle={{ backgroundColor: 'transparent'}}       
+        />
       </View>
     );
   }
@@ -91,9 +105,10 @@ export default class ScanForm extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
+    marginTop: 10
   },
   input: {
     width: 300,
@@ -110,10 +125,9 @@ const styles = StyleSheet.create({
   },
   button: {
     margin: 15,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#6CF0AE',
+    width: 300
   },
-
-  buttonText: {
-    fontSize: 14,
-    color: 'green'
-  }
 });

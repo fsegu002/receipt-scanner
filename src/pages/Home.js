@@ -8,6 +8,7 @@ import {
   Button,
   StatusBar,
 } from 'react-native';
+import { ListItem } from 'react-native-elements'
 import Axios from 'axios';
 
 export default class HomePage extends Component {
@@ -30,7 +31,7 @@ export default class HomePage extends Component {
   componentDidMount () {
     this.props.navigation.setParams({ goToCamera: this._goToCamera.bind(this) })
 
-    Axios.get('http://localhost:1337/scan')
+    Axios.get('https://receipt-scanner-api.herokuapp.com/scan')
       .then((response)=>{
         this.setState({scans: response.data})
         console.log(response)
@@ -38,28 +39,36 @@ export default class HomePage extends Component {
       .catch((err)=>{
         console.log(err)
       })
-  }
-  
+  }  
   
   _goToCamera(){
-    console.log('clicked add')
-    console.log(this.props)
     const { navigate } = this.props.navigation;
     navigate('Camera')
+  }
+
+  _handleOnPress = (id) => {
+    const { navigate } = this.props.navigation;
+    navigate('ScanDetail', { scanId: id })
   }
   
   render() {
     
     return (
       <View style={styles.container}>
-        <SectionList
-          renderItem={({item}) => <Text>{item.name}</Text>}
-          renderSectionHeader={ ({section}) => <Text style={styles.SectionHeaderStyle}> { section.title } </Text> }
-          keyExtractor={(item, index) => index.toString()}
-          sections={[ // homogeneous rendering between sections
-            {data: this.state.scans, title: 'test title'},
-          ]}
+        <StatusBar
+          barStyle="light-content"
         />
+        {
+          this.state.scans.map((l, i) => (
+            <ListItem
+              key={i}
+              // avatar={{ source: { uri: l.avatar_url } }}
+              title={l.name}
+              onPress={() => this._handleOnPress(l._id)}
+              // subtitle={l.subtitle}
+            />
+          ))
+        }
       </View>
     );
   }  
@@ -69,7 +78,7 @@ export default class HomePage extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'stretch',
     backgroundColor: '#F5FCFF',
   },
